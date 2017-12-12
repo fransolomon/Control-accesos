@@ -6,16 +6,18 @@ License boilerplate should be used here.
 # python 3 imports
 from __future__ import absolute_import, unicode_literals
 
-# app imports
-import signal
-import telnetlib
+# imports
 from datetime import datetime
+import signal
+import sys
+import telnetlib
+
+# app imports
+from server.models import Entry, User
 
 # constants
-import sys
-
-HOST = "10.10.0.159"
-PORT = 80
+HOST = "127.0.0.1"
+PORT = 5005
 TIMEOUT = 10
 
 
@@ -29,27 +31,41 @@ def main():
     try:
         print("Conectando con IP:{} Puerto:{}".format(HOST, PORT))
         t = telnetlib.Telnet()
-        t.close()
+        # t.close()
         t.open(HOST, port=PORT)
         while True:
-            telnetinput = t.read_until("HOLA", 1)
+            telnetinput = t.read_until(b"HOLA", 1)
             start_time = datetime.now()
-            # print "En espera ... "
-            if "Control" in telnetinput:
+
+            useridentifier = telnetinput[0:11]
+            print(useridentifier)
+            user, created = User.get_or_create(useridentifier=useridentifier)
+            entry = Entry(
+                date=start_time,
+                useridentifier=useridentifier,
+                username=user.username,
+                extra=telnetinput
+            )
+            if b"Control" in telnetinput:
                 print("Control at {}".format(start_time.isoformat()))
-            elif "Abre" in telnetinput:  # ex. C64BFCC4B5 Abre
+            elif b"Abre" in telnetinput:  # ex. C64BFCC4B5 Abre
                 print("Open at {}".format(start_time.isoformat()))
-                # TODO store data
-            elif "Maestra" in telnetinput:  # ex. 1E02420759 Abre 1E02420759 Maestra
+                entry.operation = 'Abre'
+                entry.save()
+            elif b"Maestra" in telnetinput:  # ex. 1E02420759 Abre 1E02420759 Maestra
                 print("Master at {}".format(start_time.isoformat()))
-                # TODO store data
-            elif "Negra" in telnetinput:  # ex. 3B4BFCD05C Negra
+                entry.operation = 'Maestra'
+                entry.save()
+            elif b"Negra" in telnetinput:  # ex. 3B4BFCD05C Negra
                 print("Banned at {}".format(start_time.isoformat()))
-                # TODO store data
-            elif "Cerrado" in telnetinput:  # ex. 6A4BFCE439 Cerrado
+                entry.operation = 'Negra'
+                entry.save()
+            elif b"Cerrado" in telnetinput:  # ex. 6A4BFCE439 Cerrado
                 print("Not allowed at {}".format(start_time.isoformat()))
-                # TODO store data
-    except Exception:
+                entry.operation = 'Cerrado'
+                entry.save()
+    except Exception as e:
+        print(e)
         print("fail connection...")
         pass
 
