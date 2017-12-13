@@ -19,7 +19,7 @@ BUFFER_SIZE = 10  # Normally 1024, but we want fast response
 
 send_data = [
     b'HOLA',
-    b'Control',
+    # b'Control',
     b'1E02420759 Abre',
     b'1E02420759 Maestra',
     b'1E02420759 Negra',

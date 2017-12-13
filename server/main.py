@@ -37,6 +37,10 @@ def main():
             telnetinput = t.read_until(b"HOLA", 1)
             start_time = datetime.now()
 
+            if b"Control" in telnetinput:
+                print("Control at {}".format(start_time.isoformat()))
+                continue
+
             useridentifier = telnetinput[0:11]
             print(useridentifier)
             user, created = User.get_or_create(useridentifier=useridentifier)
@@ -46,9 +50,7 @@ def main():
                 username=user.username,
                 extra=telnetinput
             )
-            if b"Control" in telnetinput:
-                print("Control at {}".format(start_time.isoformat()))
-            elif b"Abre" in telnetinput:  # ex. C64BFCC4B5 Abre
+            if b"Abre" in telnetinput:  # ex. C64BFCC4B5 Abre
                 print("Open at {}".format(start_time.isoformat()))
                 entry.operation = 'Abre'
                 entry.save()
