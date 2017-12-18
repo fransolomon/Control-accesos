@@ -8,9 +8,7 @@ from __future__ import absolute_import, unicode_literals
 
 # imports
 from peewee import *
-
-# definitions
-db = SqliteDatabase('registry.db')
+from config import DB
 
 
 class Entry(Model):
@@ -21,7 +19,7 @@ class Entry(Model):
     extra = TextField()
 
     class Meta:
-        database = db  # This model uses the "registry.db" database.
+        database = DB  # This model uses the "registry.db" database.
 
 
 class User(Model):
@@ -29,4 +27,4 @@ class User(Model):
     username = CharField(default='NO EN LISTA')
 
     class Meta:
-        database = db  # This model uses the "registry.db" database.
+        database = DB  # This model uses the "registry.db" database.
