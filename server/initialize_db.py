@@ -1,4 +1,5 @@
-from server.models import db, User, Entry
+from config import DB
+from server.models import User, Entry
 
-db.connect()
-db.create_tables([User, Entry])
+DB.connect()
+DB.create_tables([User, Entry])
