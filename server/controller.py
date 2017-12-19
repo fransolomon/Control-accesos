@@ -13,7 +13,10 @@ import sys
 import telnetlib
 
 # app imports
+from peewee_validates import validate_regexp, StringField
+
 from server.models import Entry, User
+from server.validators import UserValidator
 
 
 def stophandler(signum, frame):
@@ -26,50 +29,82 @@ class Server:
         self.host = host
         self.port = port
         self.timeout = timeout
+        self.start_time = datetime.now()
+        self.active = True
+
+    def deactivate(self):
+        self.active = False
+
+    def activate(self):
+        self.active = True
+
+    def connect(self):
+        print("Connect to IP:{} Port:{} at {}".format(
+            self.host, self.port, self.start_time
+        ))
+        t = telnetlib.Telnet()
+        # t.close()
+        t.open(self.host, port=self.port)
+        return t
 
     def main(self):
         signal.signal(signal.SIGINT, stophandler)
         try:
-            print(
-                "Conectando con IP:{} Puerto:{}".format(self.host, self.port))
-            t = telnetlib.Telnet()
-            # t.close()
-            t.open(self.host, port=self.port)
-            while True:
+            t = self.connect()
+            while self.active:
                 telnetinput = t.read_until(b"HOLA", 1)
+                telnetinput = str(telnetinput, 'utf-8')
+
                 start_time = datetime.now()
+                self.start_time = start_time
 
-                if b"Control" in telnetinput:
-                    print("Control at {}".format(start_time.isoformat()))
-                    continue
+                if "Control" in telnetinput:
+                    message = "Control at {}"
+                else:
+                    message = self.operate(telnetinput)
 
-                useridentifier = telnetinput[0:11]
-                print(useridentifier)
-                user, created = User.get_or_create(
-                    useridentifier=useridentifier)
-                entry = Entry(
-                    date=start_time,
-                    useridentifier=useridentifier,
-                    username=user.username,
-                    extra=telnetinput
-                )
-                if b"Abre" in telnetinput:  # ex. C64BFCC4B5 Abre
-                    print("Open at {}".format(start_time.isoformat()))
-                    entry.operation = 'Abre'
-                    entry.save()
-                elif b"Maestra" in telnetinput:  # ex. 1E02420759 Abre 1E02420759 Maestra
-                    print("Master at {}".format(start_time.isoformat()))
-                    entry.operation = 'Maestra'
-                    entry.save()
-                elif b"Negra" in telnetinput:  # ex. 3B4BFCD05C Negra
-                    print("Banned at {}".format(start_time.isoformat()))
-                    entry.operation = 'Negra'
-                    entry.save()
-                elif b"Cerrado" in telnetinput:  # ex. 6A4BFCE439 Cerrado
-                    print("Not allowed at {}".format(start_time.isoformat()))
-                    entry.operation = 'Cerrado'
-                    entry.save()
+                print(message.format(start_time.isoformat()))
+
         except Exception as e:
             print(e)
             print("fail connection...")
-            pass
+
+    def operate(self, telnetinput):
+        message = '{}'
+        useridentifier = telnetinput[0:11]
+        useridentifier = useridentifier.strip()
+
+        validator = UserValidator()
+
+        valid = validator.validate({'username': useridentifier})
+        if not valid:
+            message = 'Invalid username at {}'
+            return message
+
+        user, created = User.get_or_create(
+            useridentifier=useridentifier)
+        entry = Entry(
+            date=self.start_time,
+            useridentifier=useridentifier,
+            username=user.username,
+            extra=telnetinput
+        )
+
+        if "Abre" in telnetinput:  # ex. C64BFCC4B5 Abre
+            message = "Open at {}"
+            entry.operation = 'Abre'
+            entry.save()
+        elif "Maestra" in telnetinput:  # ex. 1E02420759 Abre 1E02420759 Maestra
+            message = "Master at {}"
+            entry.operation = 'Maestra'
+            entry.save()
+        elif "Negra" in telnetinput:  # ex. 3B4BFCD05C Negra
+            message = "Banned at {}"
+            entry.operation = 'Negra'
+            entry.save()
+        elif "Cerrado" in telnetinput:  # ex. 6A4BFCE439 Cerrado
+            message = "Not Allowed at {}"
+            entry.operation = 'Cerrado'
+            entry.save()
+
+        return message
