@@ -6,17 +6,18 @@ License boilerplate should be used here.
 # python 3 imports
 from __future__ import absolute_import, unicode_literals
 
-# imports
-from datetime import datetime
 import signal
 import sys
 import telnetlib
+# imports
+from datetime import datetime
+
+from data.models import Entry, User
+
+from data.validators import UserValidator
+
 
 # app imports
-from peewee_validates import validate_regexp, StringField
-
-from server.models import Entry, User
-from server.validators import UserValidator
 
 
 def stophandler(signum, frame):
