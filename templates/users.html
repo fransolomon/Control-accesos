@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Usuarios{% endblock %}
+{% block table %}
+    <div class="notification">
+        <h3 class="title is-3">Usuarios</h3>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Identificador</th>
+                <th>Nombre</th>
+            </tr>
+            </thead>
+            <tfoot>
+            <tr>
+                <th>Identificador</th>
+                <th>Nombre</th>
+            </tr>
+            </tfoot>
+            <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.useridentifier }}</td>
+                    <td>{{ user.username }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

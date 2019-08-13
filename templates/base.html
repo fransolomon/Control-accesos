@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}Index{% endblock %}</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.min.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.min.css.map">
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+{% include "nav.html" %}
+<div class="container is-fluid">
+    {% block content %}
+        {% block hero %}
+            <section class="hero">
+                <div class="hero-body">
+                    <div class="container">
+                        <h1 class="title">
+                            Control Acceso
+                        </h1>
+                        <h2 class="subtitle">
+                            Interfaz para la herramienta de control de Acceso
+                        </h2>
+                    </div>
+                </div>
+            </section>
+        {% endblock %}
+        {% block table %}
+            <div class="notification">
+                <h3 class="title is-3">Entradas</h3>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Operación</th>
+                        <th>Fecha</th>
+                        <th>Usuario</th>
+                        <th>Identificador</th>
+                        <th>Extra</th>
+                    </tr>
+                    </thead>
+                    <tfoot>
+                    <tr>
+                        <th>Operación</th>
+                        <th>Fecha</th>
+                        <th>Usuario</th>
+                        <th>Identificador</th>
+                        <th>Extra</th>
+                    </tr>
+                    </tfoot>
+                    <tbody>
+                    {% for entriy in entries %}
+                        <tr>
+                            <td>{{ entry.operation }}</td>
+                            <td>{{ entry.date }}</td>
+                            <td>{{ entry.username }}</td>
+                            <td>{{ entry.useridentifier }}</td>
+                            <td>{{ entry.extra }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endblock %}
+    {% endblock %}
+</div>
+
+</body>
+</html>

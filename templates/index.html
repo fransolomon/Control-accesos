@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Index{% endblock %}
+{% block table %}
+    <div class="notification">
+        <h3 class="title is-3">Entradas</h3>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Operación</th>
+                <th>Fecha</th>
+                <th>Usuario</th>
+                <th>Identificador</th>
+                <th>Extra</th>
+            </tr>
+            </thead>
+            <tfoot>
+            <tr>
+                <th>Operación</th>
+                <th>Fecha</th>
+                <th>Usuario</th>
+                <th>Identificador</th>
+                <th>Extra</th>
+            </tr>
+            </tfoot>
+            <tbody>
+            {% for entriy in entries %}
+                <tr>
+                    <td>{{ entry.operation }}</td>
+                    <td>{{ entry.date }}</td>
+                    <td>{{ entry.username }}</td>
+                    <td>{{ entry.useridentifier }}</td>
+                    <td>{{ entry.extra }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

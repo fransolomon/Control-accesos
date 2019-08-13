@@ -1,0 +1,8 @@
+# Database ORM
+peewee==2.10.2
+# Fields validator
+peewee-validates==1.0.5
+# Test coverage
+coverage==4.4.2
+# Web microframework
+Flask==0.12.2
